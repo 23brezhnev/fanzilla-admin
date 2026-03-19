@@ -35,24 +35,6 @@
           </div>
         </n-popselect>
 
-        <div v-if="!collapsed" class="venue-context">
-          <div class="venue-context__header">
-            <span class="venue-context__title">Контекст объекта</span>
-            <span class="venue-context__count">{{ venueFilterOptions.length - 1 }}</span>
-          </div>
-          <div class="venue-context__list">
-            <button
-              v-for="option in venueFilterOptions"
-              :key="option.value"
-              type="button"
-              class="venue-context__chip"
-              :class="{ 'venue-context__chip--active': selectedVenueFilter === option.value }"
-              @click="selectedVenueFilter = option.value"
-            >
-              {{ option.label }}
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- Navigation -->
@@ -123,8 +105,7 @@ import {
   PersonOutline,
   BusinessOutline
 } from '@vicons/ionicons5'
-import { venues } from '../data/mock.js'
-import { currentWorkspaceId, selectedVenueFilter } from '../stores/workspace.js'
+import { currentWorkspaceId } from '../stores/workspace.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -145,14 +126,6 @@ const workspaceSelectOptions = workspaces.map(w => ({
   label: w.name,
   value: w.id,
 }))
-
-const venueFilterOptions = computed(() => [
-  { label: 'Все объекты', value: 'all' },
-  ...venues.map(v => ({
-    label: v.name,
-    value: v.id,
-  }))
-])
 
 function handleWorkspaceSelect(id) {
   currentWorkspaceId.value = id
@@ -432,62 +405,6 @@ function handleUserMenu(key) {
   background: #f5f5f7;
 }
 
-.venue-context {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid #f0f1f3;
-}
-
-.venue-context__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.venue-context__title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.venue-context__count {
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-.venue-context__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.venue-context__chip {
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #374151;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12px;
-  line-height: 1.2;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.venue-context__chip:hover {
-  border-color: #bfd3ff;
-  background: #eef4ff;
-  color: #1d4ed8;
-}
-
-.venue-context__chip--active {
-  border-color: #1a56ff;
-  background: #1a56ff;
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(26, 86, 255, 0.18);
-}
 
 .workspace-avatar {
   width: 32px;
