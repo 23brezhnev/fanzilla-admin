@@ -32,13 +32,16 @@
             clearable
             style="width: 220px"
           />
-          <n-select
+          <n-radio-group
             v-model:value="filters.venue"
-            :options="venueOptions"
-            placeholder="Площадка"
-            clearable
-            style="width: 220px"
-          />
+          >
+            <n-radio-button
+              v-for="option in venueFilterOptions"
+              :key="option.value"
+              :value="option.value"
+              :label="option.label"
+            />
+          </n-radio-group>
           <n-date-picker
             v-model:value="filters.dateRange"
             type="daterange"
@@ -83,7 +86,7 @@ const filters = ref({
   search: '',
   types: null,
   statuses: null,
-  venue: null,
+  venue: 'all',
   dateRange: null
 })
 
@@ -116,6 +119,11 @@ const venueOptions = venues.map(v => ({
   value: v.id
 }))
 
+const venueFilterOptions = [
+  { label: 'Все объекты', value: 'all' },
+  ...venueOptions
+]
+
 const eventTypeMap = Object.fromEntries(eventTypes.map(t => [t.value, t]))
 
 const filteredEvents = computed(() => {
@@ -134,7 +142,7 @@ const filteredEvents = computed(() => {
     result = result.filter(e => filters.value.statuses.includes(e.status))
   }
 
-  if (filters.value.venue) {
+  if (filters.value.venue !== 'all') {
     result = result.filter(e => e.venue === filters.value.venue)
   }
 
