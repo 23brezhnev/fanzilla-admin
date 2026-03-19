@@ -1,14 +1,15 @@
 <template>
   <div>
     <n-space vertical :size="24">
-      <!-- Header -->
-      <n-space justify="space-between" align="center">
-        <h2 style="margin: 0; font-size: 24px; font-weight: 700">Объекты</h2>
-        <n-button type="primary" @click="router.push('/venues/create')">Создать объект</n-button>
-      </n-space>
+      <n-page-header title="Объекты">
+        <template #extra>
+          <n-button type="primary" @click="router.push('/venues/create')">Создать объект</n-button>
+        </template>
+      </n-page-header>
 
       <!-- Filters -->
-      <n-space>
+      <n-card size="small">
+        <n-space>
         <n-input
           v-model:value="searchQuery"
           placeholder="Поиск по названию или адресу"
@@ -29,7 +30,8 @@
           :options="statusOptions"
           style="width: 180px"
         />
-      </n-space>
+        </n-space>
+      </n-card>
 
       <!-- Table -->
       <n-data-table
@@ -47,8 +49,7 @@
 <script setup>
 import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { NTag, NButton, NDropdown, NIcon, NSpace } from 'naive-ui'
-import { EllipsisVertical, BusinessOutline, CreateOutline, TrashOutline, CopyOutline } from '@vicons/ionicons5'
+import { NTag, NButton, NSpace } from 'naive-ui'
 import { venues, venueTypes, venueStatuses, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
@@ -81,13 +82,7 @@ const filteredVenues = computed(() => {
 const columns = [
   {
     title: 'Название',
-    key: 'name',
-    render(row) {
-      return h(NSpace, { align: 'center', size: 12 }, () => [
-        h(NIcon, { component: BusinessOutline, size: 20, color: '#999' }),
-        h('span', { style: 'font-weight: 500' }, row.name)
-      ])
-    }
+    key: 'name'
   },
   {
     title: 'Тип',
@@ -132,23 +127,24 @@ const columns = [
     }
   },
   {
-    title: '',
+    title: 'Действия',
     key: 'actions',
-    width: 60,
+    width: 180,
     render(row) {
-      const options = [
-        { label: 'Редактировать', key: 'edit', icon: () => h(NIcon, { component: CreateOutline }) },
-        { label: 'Дублировать', key: 'duplicate', icon: () => h(NIcon, { component: CopyOutline }) },
-        { type: 'divider', key: 'd1' },
-        { label: 'Удалить', key: 'delete', icon: () => h(NIcon, { component: TrashOutline }) }
-      ]
-      return h(NDropdown, {
-        trigger: 'click',
-        options,
-        onSelect: (key) => handleAction(key, row)
-      }, () => h(NButton, { quaternary: true, circle: true, size: 'small' }, () =>
-        h(NIcon, { component: EllipsisVertical })
-      ))
+      return h(NSpace, { size: 8, justify: 'end' }, {
+        default: () => [
+          h(NButton, {
+            size: 'small',
+            quaternary: true,
+            onClick: () => handleAction('edit', row)
+          }, { default: () => 'Изменить' }),
+          h(NButton, {
+            size: 'small',
+            quaternary: true,
+            onClick: () => handleAction('duplicate', row)
+          }, { default: () => 'Дублировать' })
+        ]
+      })
     }
   }
 ]

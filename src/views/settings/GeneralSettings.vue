@@ -1,10 +1,12 @@
 <template>
   <div>
     <n-space vertical :size="24">
-      <h2 style="margin: 0; font-size: 24px; font-weight: 700">Основные настройки</h2>
+      <n-page-header title="Основные настройки" />
 
-      <n-card title="Глобальные настройки продукта">
-        <n-form :model="globalProductSettings" label-placement="left" label-width="220" :style="{ maxWidth: '760px' }">
+      <n-tabs type="segment">
+        <n-tab-pane name="global" tab="Глобальные">
+          <n-card title="Глобальные настройки продукта">
+            <n-form :model="globalProductSettings" label-placement="left" label-width="220" :style="{ maxWidth: '760px' }">
           <n-form-item label="Название продукта">
             <n-input v-model:value="globalProductSettings.productName" placeholder="Название продукта" />
           </n-form-item>
@@ -54,19 +56,23 @@
           <n-form-item>
             <n-button type="primary" @click="handleGlobalSave">Сохранить глобальные настройки</n-button>
           </n-form-item>
-        </n-form>
-      </n-card>
+            </n-form>
+          </n-card>
+        </n-tab-pane>
 
-      <n-card title="Настройки объекта">
-        <n-space vertical :size="16">
-          <n-alert v-if="!currentVenue" type="info" :show-icon="false">
-            Выберите объект в глобальном фильтре слева, чтобы настроить параметры конкретной площадки.
-          </n-alert>
+        <n-tab-pane name="venue" tab="По объекту">
+          <n-card title="Настройки объекта">
+            <n-space vertical :size="16">
+              <n-alert v-if="!currentVenue" type="info" :show-icon="false">
+                Выберите объект в глобальном фильтре слева, чтобы настроить параметры конкретной площадки.
+              </n-alert>
 
-          <template v-else>
-            <n-text depth="3">Сейчас редактируется объект: <strong>{{ currentVenue.name }}</strong></n-text>
+              <template v-else>
+                <n-alert type="default" :show-icon="false">
+                  Сейчас редактируется объект: <strong>{{ currentVenue.name }}</strong>
+                </n-alert>
 
-            <n-form :model="currentVenueSettings" label-placement="left" label-width="220" :style="{ maxWidth: '760px' }">
+                <n-form :model="currentVenueSettings" label-placement="left" label-width="220" :style="{ maxWidth: '760px' }">
               <n-form-item label="Публичное название">
                 <n-input v-model:value="currentVenue.name" placeholder="Название объекта" />
               </n-form-item>
@@ -102,10 +108,12 @@
               <n-form-item>
                 <n-button type="primary" @click="handleVenueSave">Сохранить настройки объекта</n-button>
               </n-form-item>
-            </n-form>
-          </template>
-        </n-space>
-      </n-card>
+                </n-form>
+              </template>
+            </n-space>
+          </n-card>
+        </n-tab-pane>
+      </n-tabs>
     </n-space>
   </div>
 </template>

@@ -1,11 +1,12 @@
 <template>
   <div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px">
-      <h2 style="margin: 0; font-size: 24px; font-weight: 700">Услуги</h2>
-      <n-button type="primary" @click="openCreateModal">
-        + Создать услугу
-      </n-button>
-    </div>
+    <n-page-header title="Услуги" style="margin-bottom: 24px">
+      <template #extra>
+        <n-button type="primary" @click="openCreateModal">
+          Создать услугу
+        </n-button>
+      </template>
+    </n-page-header>
 
     <n-card>
       <n-data-table
@@ -74,8 +75,7 @@
 
 <script setup>
 import { ref, reactive, h } from 'vue'
-import { NButton, NSpace, NIcon, NTag } from 'naive-ui'
-import { CreateOutline, TrashOutline } from '@vicons/ionicons5'
+import { NButton, NSpace, NTag } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { services } from '../../data/mock.js'
 
@@ -166,9 +166,7 @@ const columns = [
   {
     title: 'Slug',
     key: 'slug',
-    render(row) {
-      return h('code', { style: 'padding: 2px 6px; background: #f4f4f5; border-radius: 4px; font-size: 13px' }, row.slug)
-    }
+    width: 160
   },
   {
     title: 'Категория',
@@ -198,24 +196,18 @@ const columns = [
     key: 'actions',
     width: 100,
     render(row) {
-      return h(NSpace, { size: 4 }, {
+      return h(NSpace, { size: 8, justify: 'end' }, {
         default: () => [
           h(NButton, {
-            quaternary: true,
-            circle: true,
             size: 'small',
+            quaternary: true,
             onClick: () => openEditModal(row)
-          }, {
-            icon: () => h(NIcon, { component: CreateOutline })
-          }),
+          }, { default: () => 'Изменить' }),
           h(NButton, {
-            quaternary: true,
-            circle: true,
             size: 'small',
+            quaternary: true,
             onClick: () => handleDelete(row)
-          }, {
-            icon: () => h(NIcon, { component: TrashOutline })
-          })
+          }, { default: () => 'Удалить' })
         ]
       })
     }
