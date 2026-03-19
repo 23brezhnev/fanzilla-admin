@@ -49,7 +49,7 @@ import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTag, NButton, NDropdown, NIcon, NSpace } from 'naive-ui'
 import { EllipsisVertical, BusinessOutline, CreateOutline, TrashOutline, CopyOutline } from '@vicons/ionicons5'
-import { venues, venueTypes, venueStatuses } from '../../data/mock.js'
+import { venues, venueTypes, venueStatuses, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
 
@@ -68,7 +68,7 @@ const statusColorMap = {
 }
 
 const filteredVenues = computed(() => {
-  return venues.filter(v => {
+  return filterByVenueContext(venues).filter(v => {
     const matchSearch = !searchQuery.value ||
       v.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       v.address.toLowerCase().includes(searchQuery.value.toLowerCase())

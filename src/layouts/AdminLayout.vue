@@ -13,6 +13,22 @@
       :native-scrollbar="false"
       style="background: #fff"
     >
+      <div v-if="!collapsed" class="sidebar-scope">
+        <div class="sidebar-scope__label">Объект</div>
+        <div class="sidebar-scope__chips">
+          <button
+            v-for="option in venueFilterOptions"
+            :key="option.value"
+            type="button"
+            class="sidebar-scope__chip"
+            :class="{ 'sidebar-scope__chip--active': selectedVenueFilter === option.value }"
+            @click="selectedVenueFilter = option.value"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+
       <!-- Navigation -->
       <n-menu
         :collapsed="collapsed"
@@ -79,8 +95,9 @@ import {
   NotificationsOutline,
   LogOutOutline,
   PersonOutline,
-  BusinessOutline
 } from '@vicons/ionicons5'
+import { venues } from '../data/mock.js'
+import { selectedVenueFilter } from '../stores/workspace.js'
 const router = useRouter()
 const route = useRoute()
 const collapsed = ref(false)
@@ -88,6 +105,14 @@ const collapsed = ref(false)
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
+
+const venueFilterOptions = computed(() => [
+  { label: 'Все объекты', value: 'all' },
+  ...venues.map(venue => ({
+    label: venue.name,
+    value: venue.id
+  }))
+])
 
 const menuOptions = [
   {
@@ -352,5 +377,50 @@ function handleUserMenu(key) {
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
+}
+
+.sidebar-scope {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid #efeff5;
+}
+
+.sidebar-scope__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.sidebar-scope__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sidebar-scope__chip {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-scope__chip:hover {
+  border-color: #bfd3ff;
+  background: #eef4ff;
+  color: #1d4ed8;
+}
+
+.sidebar-scope__chip--active {
+  border-color: #1a56ff;
+  background: #1a56ff;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(26, 86, 255, 0.18);
 }
 </style>
