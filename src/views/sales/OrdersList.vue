@@ -115,7 +115,7 @@
 import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTag, NButton, NSpace, NBadge } from 'naive-ui'
-import { orders, orderStatuses, salesChannels } from '../../data/mock.js'
+import { orders, orderStatuses, salesChannels, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
 
@@ -169,7 +169,7 @@ function toggleQuickFilter(filter) {
 
 // --- Filtered data ---
 const filteredOrders = computed(() => {
-  let result = [...orders]
+  let result = filterByVenueContext(orders)
 
   // Quick filters
   if (quickFilter.value === 'today') {

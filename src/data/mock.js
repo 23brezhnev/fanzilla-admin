@@ -3,7 +3,7 @@
 // Reactive per-workspace data — auto-switches when workspace changes
 // ============================================================
 import { reactive, watch } from 'vue'
-import { currentWorkspaceId } from '../stores/workspace.js'
+import { currentWorkspaceId, selectedVenueFilter } from '../stores/workspace.js'
 
 // ============================================================
 // STATIC DATA (same across all workspaces)
@@ -570,6 +570,47 @@ export const teamMembers = reactive([...ws1.teamMembers])
 // Reactive objects
 export const templatePrices = reactive({ ...ws1.templatePrices })
 export const dashboardMetrics = reactive({ ...ws1.dashboardMetrics })
+
+function resolveRecordVenueId(record) {
+  if (!record) return null
+  if (record.venue !== undefined && record.venue !== null) return record.venue
+  if (record.venueId !== undefined && record.venueId !== null) return record.venueId
+
+  if (record.event) {
+    const event = events.find(e => e.name === record.event)
+    if (event) return event.venue
+  }
+
+  if (record.ticketId) {
+    const ticket = tickets.find(t => t.id === record.ticketId)
+    const venueId = resolveRecordVenueId(ticket)
+    if (venueId !== null) return venueId
+  }
+
+  if (record.orderId) {
+    const order = orders.find(o => o.id === record.orderId)
+    const venueId = resolveRecordVenueId(order)
+    if (venueId !== null) return venueId
+  }
+
+  if (record.parentOrderId) {
+    const order = orders.find(o => o.id === record.parentOrderId)
+    const venueId = resolveRecordVenueId(order)
+    if (venueId !== null) return venueId
+  }
+
+  return null
+}
+
+export function matchesVenueContext(record) {
+  if (selectedVenueFilter.value === 'all') return true
+  return resolveRecordVenueId(record) === selectedVenueFilter.value
+}
+
+export function filterByVenueContext(items) {
+  if (selectedVenueFilter.value === 'all') return [...items]
+  return items.filter(matchesVenueContext)
+}
 
 // Watch workspace changes and sync all data
 watch(currentWorkspaceId, (id) => {

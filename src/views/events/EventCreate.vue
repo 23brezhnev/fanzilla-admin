@@ -201,11 +201,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, h } from 'vue'
+import { ref, reactive, computed, h, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { NInputNumber } from 'naive-ui'
 import { eventTypes, venues, pricingTemplates, priceCategories, tariffs, ticketTypes, templatePrices } from '../../data/mock.js'
+import { selectedVenueFilter } from '../../stores/workspace.js'
 
 const router = useRouter()
 const message = useMessage()
@@ -217,10 +218,16 @@ const typeDescriptions = {
   standard: 'Концерт, шоу, фестиваль и другие события'
 }
 
-const venueOptions = venues.map(v => ({
-  label: v.name,
-  value: v.id
-}))
+const venueOptions = computed(() => {
+  const scopedVenues = selectedVenueFilter.value === 'all'
+    ? venues
+    : venues.filter(v => v.id === selectedVenueFilter.value)
+
+  return scopedVenues.map(v => ({
+    label: v.name,
+    value: v.id
+  }))
+})
 
 const pricingTemplateOptions = pricingTemplates
   .filter(t => t.status === 'active')
@@ -246,6 +253,14 @@ const form = reactive({
   gateOpening: null,
   publishStatus: 'draft'
 })
+
+watch(
+  () => selectedVenueFilter.value,
+  (value) => {
+    form.venue = value === 'all' ? null : value
+  },
+  { immediate: true }
+)
 
 const rules = {
   venue: { required: true, type: 'number', message: 'Выберите площадку', trigger: 'change' },

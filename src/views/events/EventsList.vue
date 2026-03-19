@@ -68,8 +68,7 @@
 import { ref, reactive, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTag, NProgress, NButton } from 'naive-ui'
-import { events, eventTypes, eventStatuses } from '../../data/mock.js'
-import { selectedVenueFilter } from '../../stores/workspace.js'
+import { events, eventTypes, eventStatuses, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
 
@@ -107,7 +106,7 @@ const statusOptions = Object.entries(eventStatuses).map(([value, s]) => ({
 const eventTypeMap = Object.fromEntries(eventTypes.map(t => [t.value, t]))
 
 const filteredEvents = computed(() => {
-  let result = [...events]
+  let result = filterByVenueContext(events)
 
   if (filters.value.search) {
     const q = filters.value.search.toLowerCase()
@@ -120,10 +119,6 @@ const filteredEvents = computed(() => {
 
   if (filters.value.statuses && filters.value.statuses.length > 0) {
     result = result.filter(e => filters.value.statuses.includes(e.status))
-  }
-
-  if (selectedVenueFilter.value !== 'all') {
-    result = result.filter(e => e.venue === selectedVenueFilter.value)
   }
 
   if (filters.value.dateRange) {

@@ -5,7 +5,7 @@
 
       <n-data-table
         :columns="columns"
-        :data="rentalItems"
+        :data="filteredRentalItems"
         :bordered="false"
         :single-line="false"
         striped
@@ -15,9 +15,11 @@
 </template>
 
 <script setup>
-import { h } from 'vue'
+import { h, computed } from 'vue'
 import { NTag } from 'naive-ui'
-import { rentalItems } from '../../data/mock.js'
+import { rentalItems, filterByVenueContext } from '../../data/mock.js'
+
+const filteredRentalItems = computed(() => filterByVenueContext(rentalItems))
 
 const statusMap = {
   pending: { label: 'Ожидает', type: 'warning' },

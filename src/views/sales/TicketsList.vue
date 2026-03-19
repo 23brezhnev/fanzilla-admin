@@ -84,7 +84,7 @@
 import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTag, NButton } from 'naive-ui'
-import { tickets, ticketStatuses } from '../../data/mock.js'
+import { tickets, ticketStatuses, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
 
@@ -96,7 +96,7 @@ const selectedTariff = ref(null)
 
 // Unique events from tickets
 const eventOptions = computed(() => {
-  const unique = [...new Set(tickets.map(t => t.event))]
+  const unique = [...new Set(filterByVenueContext(tickets).map(t => t.event))]
   return unique.map(e => ({ label: e, value: e }))
 })
 
@@ -107,13 +107,13 @@ const statusOptions = Object.entries(ticketStatuses).map(([value, s]) => ({
 
 // Unique tariffs from tickets
 const tariffOptions = computed(() => {
-  const unique = [...new Set(tickets.map(t => t.tariff))]
+  const unique = [...new Set(filterByVenueContext(tickets).map(t => t.tariff))]
   return unique.map(t => ({ label: t, value: t }))
 })
 
 // --- Filtered data ---
 const filteredTickets = computed(() => {
-  let result = [...tickets]
+  let result = filterByVenueContext(tickets)
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()

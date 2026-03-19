@@ -35,18 +35,18 @@
           </div>
         </n-popselect>
 
-        <div v-if="!collapsed" class="venue-filter">
-          <div class="venue-filter__header">
-            <span class="venue-filter__title">Объект</span>
-            <span class="venue-filter__count">{{ venueFilterOptions.length - 1 }}</span>
+        <div v-if="!collapsed" class="venue-context">
+          <div class="venue-context__header">
+            <span class="venue-context__title">Контекст объекта</span>
+            <span class="venue-context__count">{{ venueFilterOptions.length - 1 }}</span>
           </div>
-          <div class="venue-filter__list">
+          <div class="venue-context__list">
             <button
               v-for="option in venueFilterOptions"
               :key="option.value"
               type="button"
-              class="venue-filter__chip"
-              :class="{ 'venue-filter__chip--active': selectedVenueFilter === option.value }"
+              class="venue-context__chip"
+              :class="{ 'venue-context__chip--active': selectedVenueFilter === option.value }"
               @click="selectedVenueFilter = option.value"
             >
               {{ option.label }}
@@ -224,14 +224,6 @@ const menuOptions = [
     ]
   },
   {
-    label: 'Объекты',
-    key: 'venues',
-    icon: renderIcon(BusinessOutline),
-    children: [
-      { label: 'Список объектов', key: 'venues-list' },
-    ]
-  },
-  {
     label: 'Аналитика',
     key: 'analytics',
     icon: renderIcon(StatsChartOutline)
@@ -246,6 +238,7 @@ const menuOptions = [
     icon: renderIcon(SettingsOutline),
     children: [
       { label: 'Основные', key: 'settings-general' },
+      { label: 'Объекты', key: 'settings-venues' },
       { label: 'Команда', key: 'settings-team' },
       { label: 'Каналы продаж', key: 'settings-channels' },
       { label: 'Интеграции', key: 'settings-integrations' },
@@ -268,7 +261,7 @@ const routeMap = {
   'crm-guests': '/crm/guests',
   'crm-segments': '/crm/segments',
   'crm-loyalty': '/crm/loyalty',
-  'venues-list': '/venues',
+  'settings-venues': '/venues',
   'analytics': '/analytics',
   'settings-general': '/settings/general',
   'settings-team': '/settings/team',
@@ -287,7 +280,7 @@ const activeKey = computed(() => {
   if (path.startsWith('/sales/orders')) return 'sales-orders'
   if (path.startsWith('/sales/tickets')) return 'sales-tickets'
   if (path.startsWith('/pricing')) return 'pricing'
-  if (path.startsWith('/venues')) return 'venues-list'
+  if (path.startsWith('/venues')) return 'settings-venues'
   if (path.startsWith('/crm/guests')) return 'crm-guests'
   if (path.startsWith('/crm/segments')) return 'crm-segments'
   if (path.startsWith('/crm/loyalty')) return 'crm-loyalty'
@@ -314,6 +307,7 @@ const breadcrumbs = computed(() => {
     if (path.includes('/templates/create')) crumbs.push({ label: 'Создание шаблона', path: path })
     else if (path.includes('/templates/') && route.params.id) crumbs.push({ label: 'Редактирование шаблона', path: path })
   } else if (path.startsWith('/venues')) {
+    crumbs.push({ label: 'Настройки', path: '/settings/general' })
     crumbs.push({ label: 'Объекты', path: '/venues' })
     if (path.includes('/create')) crumbs.push({ label: 'Новый объект', path: path })
     else if (route.params.id) crumbs.push({ label: 'Карточка объекта', path: path })
@@ -349,7 +343,7 @@ const readyKeys = new Set([
   'events', 'events-list',
   'pricing',
   'sales', 'sales-orders', 'sales-tickets',
-  'venues', 'venues-list',
+  'settings-venues',
   'crm', 'crm-guests', 'crm-segments',
 ])
 
@@ -438,20 +432,20 @@ function handleUserMenu(key) {
   background: #f5f5f7;
 }
 
-.venue-filter {
+.venue-context {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid #f0f1f3;
 }
 
-.venue-filter__header {
+.venue-context__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.venue-filter__title {
+.venue-context__title {
   font-size: 12px;
   font-weight: 700;
   color: #6b7280;
@@ -459,18 +453,18 @@ function handleUserMenu(key) {
   letter-spacing: 0.04em;
 }
 
-.venue-filter__count {
+.venue-context__count {
   font-size: 11px;
   color: #9ca3af;
 }
 
-.venue-filter__list {
+.venue-context__list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.venue-filter__chip {
+.venue-context__chip {
   border: 1px solid #e5e7eb;
   background: #f9fafb;
   color: #374151;
@@ -482,13 +476,13 @@ function handleUserMenu(key) {
   transition: all 0.2s ease;
 }
 
-.venue-filter__chip:hover {
+.venue-context__chip:hover {
   border-color: #bfd3ff;
   background: #eef4ff;
   color: #1d4ed8;
 }
 
-.venue-filter__chip--active {
+.venue-context__chip--active {
   border-color: #1a56ff;
   background: #1a56ff;
   color: #fff;

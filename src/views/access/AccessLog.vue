@@ -5,7 +5,7 @@
 
       <n-data-table
         :columns="columns"
-        :data="accessLog"
+        :data="filteredAccessLog"
         :bordered="false"
         :single-line="false"
         striped
@@ -15,9 +15,11 @@
 </template>
 
 <script setup>
-import { h } from 'vue'
+import { h, computed } from 'vue'
 import { NTag } from 'naive-ui'
-import { accessLog } from '../../data/mock.js'
+import { accessLog, filterByVenueContext } from '../../data/mock.js'
+
+const filteredAccessLog = computed(() => filterByVenueContext(accessLog))
 
 const directionMap = {
   in: { label: 'Вход', type: 'success' },
