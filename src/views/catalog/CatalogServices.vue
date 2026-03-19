@@ -1,8 +1,7 @@
 <template>
-  <n-card title="Услуги">
-    <n-result status="info" title="Раздел в разработке" description="Функционал будет доступен в ближайшем обновлении" />
-  </n-card>
+  <ServicesList />
 </template>
 
 <script setup>
+import ServicesList from '../pricing/ServicesList.vue'
 </script>
