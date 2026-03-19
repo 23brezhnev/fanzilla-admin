@@ -15,18 +15,11 @@
     >
       <div v-if="!collapsed" class="sidebar-scope">
         <div class="sidebar-scope__label">Объект</div>
-        <div class="sidebar-scope__chips">
-          <button
-            v-for="option in venueFilterOptions"
-            :key="option.value"
-            type="button"
-            class="sidebar-scope__chip"
-            :class="{ 'sidebar-scope__chip--active': selectedVenueFilter === option.value }"
-            @click="selectedVenueFilter = option.value"
-          >
-            {{ option.label }}
-          </button>
-        </div>
+        <n-select
+          v-model:value="selectedVenueFilter"
+          :options="venueFilterOptions"
+          size="small"
+        />
       </div>
 
       <!-- Navigation -->
@@ -61,7 +54,7 @@
           <n-dropdown :options="userMenuOptions" @select="handleUserMenu">
             <n-button quaternary>
               <template #icon>
-                <span class="user-avatar">АИ</span>
+                <n-avatar round size="small" color="#1A56FF">АИ</n-avatar>
               </template>
               <span style="margin-left: 8px">Александр И.</span>
             </n-button>
@@ -80,7 +73,7 @@
 <script setup>
 import { ref, computed, h } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { NIcon } from 'naive-ui'
+import { NAvatar, NIcon } from 'naive-ui'
 import {
   HomeOutline,
   CalendarOutline,
@@ -364,21 +357,6 @@ function handleUserMenu(key) {
   white-space: nowrap;
 }
 
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #1a56ff;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-}
-
 .sidebar-scope {
   padding: 16px 16px 12px;
   border-bottom: 1px solid #efeff5;
@@ -391,36 +369,5 @@ function handleUserMenu(key) {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 10px;
-}
-
-.sidebar-scope__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sidebar-scope__chip {
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #374151;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12px;
-  line-height: 1.2;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sidebar-scope__chip:hover {
-  border-color: #bfd3ff;
-  background: #eef4ff;
-  color: #1d4ed8;
-}
-
-.sidebar-scope__chip--active {
-  border-color: #1a56ff;
-  background: #1a56ff;
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(26, 86, 255, 0.18);
 }
 </style>
