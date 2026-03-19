@@ -101,7 +101,7 @@ const menuOptions = [
     icon: renderIcon(CalendarOutline),
     children: [
       { label: 'События', key: 'events-list' },
-      { label: 'Каталог услуг', key: 'products-services' },
+      { label: 'Услуги', key: 'products-services' },
     ]
   },
   {
@@ -224,7 +224,7 @@ const breadcrumbs = computed(() => {
     else if (route.params.id) crumbs.push({ label: 'Карточка события', path: path })
   } else if (path.startsWith('/catalog/services')) {
     crumbs.push({ label: 'Продукты', path: '/events' })
-    crumbs.push({ label: 'Каталог услуг', path: '/catalog/services' })
+    crumbs.push({ label: 'Услуги', path: '/catalog/services' })
   } else if (path.startsWith('/sales/orders')) {
     crumbs.push({ label: 'Продажи', path: '/sales/orders' })
     crumbs.push({ label: 'Заказы', path: '/sales/orders' })

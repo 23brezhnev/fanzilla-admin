@@ -17,9 +17,6 @@
       <n-tab-pane name="ticket-types" tab="Типы билетов">
         <TicketTypesList />
       </n-tab-pane>
-      <n-tab-pane name="services" tab="Услуги">
-        <ServicesList />
-      </n-tab-pane>
     </n-tabs>
   </div>
 </template>
@@ -30,27 +27,21 @@ import { useRouter, useRoute } from 'vue-router'
 import TemplatesList from './TemplatesListInline.vue'
 import TariffsList from './TariffsListInline.vue'
 import TicketTypesList from './TicketTypesListInline.vue'
-import ServicesList from './ServicesListInline.vue'
 
 const router = useRouter()
 const route = useRoute()
 
-const tabMap = {
-  'templates': 'templates',
-  'tariffs': 'tariffs',
-  'ticket-types': 'ticket-types',
-  'services': 'services',
-}
-
-const activeTab = ref(route.query.tab || 'templates')
+const availableTabs = new Set(['templates', 'tariffs', 'ticket-types'])
+const activeTab = ref(availableTabs.has(route.query.tab) ? route.query.tab : 'templates')
 
 watch(activeTab, (tab) => {
   router.replace({ path: '/pricing', query: { tab } })
 })
 
 watch(() => route.query.tab, (tab) => {
-  if (tab && tab !== activeTab.value) {
-    activeTab.value = tab
+  const normalizedTab = availableTabs.has(tab) ? tab : 'templates'
+  if (normalizedTab !== activeTab.value) {
+    activeTab.value = normalizedTab
   }
 })
 </script>
