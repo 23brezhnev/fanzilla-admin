@@ -96,11 +96,12 @@ const menuOptions = [
     icon: renderIcon(HomeOutline)
   },
   {
-    label: 'Расписание',
-    key: 'events',
+    label: 'Продукты',
+    key: 'products',
     icon: renderIcon(CalendarOutline),
     children: [
-      { label: 'Управление событиями', key: 'events-list' },
+      { label: 'События', key: 'events-list' },
+      { label: 'Каталог услуг', key: 'products-services' },
     ]
   },
   {
@@ -173,6 +174,7 @@ const menuOptions = [
 const routeMap = {
   'dashboard': '/dashboard',
   'events-list': '/events',
+  'products-services': '/catalog/services',
   'pricing': '/pricing',
   'sales-orders': '/sales/orders',
   'sales-tickets': '/sales/tickets',
@@ -201,6 +203,7 @@ const activeKey = computed(() => {
   const path = route.path
   if (reverseRouteMap[path]) return reverseRouteMap[path]
   if (path.startsWith('/events')) return 'events-list'
+  if (path.startsWith('/catalog/services')) return 'products-services'
   if (path.startsWith('/sales/orders')) return 'sales-orders'
   if (path.startsWith('/sales/tickets')) return 'sales-tickets'
   if (path.startsWith('/pricing')) return 'pricing'
@@ -216,9 +219,12 @@ const breadcrumbs = computed(() => {
   const path = route.path
 
   if (path.startsWith('/events')) {
-    crumbs.push({ label: 'Расписание', path: '/events' })
+    crumbs.push({ label: 'Продукты', path: '/events' })
     if (path.includes('/create')) crumbs.push({ label: 'Создание события', path: path })
     else if (route.params.id) crumbs.push({ label: 'Карточка события', path: path })
+  } else if (path.startsWith('/catalog/services')) {
+    crumbs.push({ label: 'Продукты', path: '/events' })
+    crumbs.push({ label: 'Каталог услуг', path: '/catalog/services' })
   } else if (path.startsWith('/sales/orders')) {
     crumbs.push({ label: 'Продажи', path: '/sales/orders' })
     crumbs.push({ label: 'Заказы', path: '/sales/orders' })
@@ -264,7 +270,7 @@ function handleMenuSelect(key) {
 
 // Keys that are NOT beta (ready sections)
 const readyKeys = new Set([
-  'events', 'events-list',
+  'products', 'events-list', 'products-services',
   'pricing',
   'sales', 'sales-orders', 'sales-tickets',
   'settings-venues',
