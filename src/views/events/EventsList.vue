@@ -32,16 +32,6 @@
             clearable
             style="width: 220px"
           />
-          <n-radio-group
-            v-model:value="filters.venue"
-          >
-            <n-radio-button
-              v-for="option in venueFilterOptions"
-              :key="option.value"
-              :value="option.value"
-              :label="option.label"
-            />
-          </n-radio-group>
           <n-date-picker
             v-model:value="filters.dateRange"
             type="daterange"
@@ -78,7 +68,8 @@
 import { ref, reactive, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { NTag, NProgress, NButton } from 'naive-ui'
-import { events, eventTypes, eventStatuses, venues } from '../../data/mock.js'
+import { events, eventTypes, eventStatuses } from '../../data/mock.js'
+import { selectedVenueFilter } from '../../stores/workspace.js'
 
 const router = useRouter()
 
@@ -86,7 +77,6 @@ const filters = ref({
   search: '',
   types: null,
   statuses: null,
-  venue: 'all',
   dateRange: null
 })
 
@@ -114,16 +104,6 @@ const statusOptions = Object.entries(eventStatuses).map(([value, s]) => ({
   value
 }))
 
-const venueOptions = venues.map(v => ({
-  label: v.name,
-  value: v.id
-}))
-
-const venueFilterOptions = [
-  { label: 'Все объекты', value: 'all' },
-  ...venueOptions
-]
-
 const eventTypeMap = Object.fromEntries(eventTypes.map(t => [t.value, t]))
 
 const filteredEvents = computed(() => {
@@ -142,8 +122,8 @@ const filteredEvents = computed(() => {
     result = result.filter(e => filters.value.statuses.includes(e.status))
   }
 
-  if (filters.value.venue !== 'all') {
-    result = result.filter(e => e.venue === filters.value.venue)
+  if (selectedVenueFilter.value !== 'all') {
+    result = result.filter(e => e.venue === selectedVenueFilter.value)
   }
 
   if (filters.value.dateRange) {
