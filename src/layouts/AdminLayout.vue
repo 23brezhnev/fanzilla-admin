@@ -13,30 +13,6 @@
       :native-scrollbar="false"
       style="background: #fff"
     >
-      <!-- Workspace Switcher -->
-      <div class="workspace-switcher" :class="{ 'workspace-switcher--collapsed': collapsed }">
-        <n-popselect
-          v-model:value="currentWorkspaceId"
-          :options="workspaceSelectOptions"
-          trigger="click"
-          @update:value="handleWorkspaceSelect"
-        >
-          <div class="workspace-trigger">
-            <div class="workspace-avatar" :style="{ background: currentWorkspace.color }">
-              {{ currentWorkspace.initials }}
-            </div>
-            <template v-if="!collapsed">
-              <div class="workspace-info">
-                <div class="workspace-name">{{ currentWorkspace.name }}</div>
-                <div class="workspace-plan">{{ currentWorkspace.plan }}</div>
-              </div>
-              <span style="margin-left: auto; opacity: 0.4; font-size: 14px">⌄</span>
-            </template>
-          </div>
-        </n-popselect>
-
-      </div>
-
       <!-- Navigation -->
       <n-menu
         :collapsed="collapsed"
@@ -69,7 +45,7 @@
           <n-dropdown :options="userMenuOptions" @select="handleUserMenu">
             <n-button quaternary>
               <template #icon>
-                <n-avatar round size="small" style="background: #1A56FF; cursor: pointer">АИ</n-avatar>
+                <span class="user-avatar">АИ</span>
               </template>
               <span style="margin-left: 8px">Александр И.</span>
             </n-button>
@@ -105,34 +81,9 @@ import {
   PersonOutline,
   BusinessOutline
 } from '@vicons/ionicons5'
-import { currentWorkspaceId } from '../stores/workspace.js'
-
 const router = useRouter()
 const route = useRoute()
 const collapsed = ref(false)
-
-// --- Workspaces ---
-const workspaces = [
-  { id: 1, name: 'Каток Лужники', initials: 'КЛ', color: '#1A56FF', plan: 'Pro' },
-  { id: 2, name: 'Аквакомплекс Лужники', initials: 'АЛ', color: '#18a058', plan: 'Pro' },
-  { id: 3, name: 'Центральный стадион Лужники', initials: 'ЦС', color: '#d03050', plan: 'Enterprise' },
-]
-
-const currentWorkspace = computed(() =>
-  workspaces.find(w => w.id === currentWorkspaceId.value) || workspaces[0]
-)
-
-const workspaceSelectOptions = workspaces.map(w => ({
-  label: w.name,
-  value: w.id,
-}))
-
-function handleWorkspaceSelect(id) {
-  currentWorkspaceId.value = id
-  window.$message?.success(`Переключено на «${workspaces.find(w => w.id === id)?.name}»`)
-  // Navigate to dashboard on workspace switch
-  router.push('/dashboard')
-}
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -382,59 +333,18 @@ function handleUserMenu(key) {
   white-space: nowrap;
 }
 
-.workspace-switcher {
-  padding: 12px 16px;
-  border-bottom: 1px solid #efeff5;
-}
-
-.workspace-switcher--collapsed {
-  padding: 12px 10px;
-}
-
-.workspace-trigger {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.workspace-trigger:hover {
-  background: #f5f5f7;
-}
-
-
-.workspace-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 12px;
+  background: #1a56ff;
   color: #fff;
-  flex-shrink: 0;
-}
-
-.workspace-info {
-  min-width: 0;
-  flex: 1;
-}
-
-.workspace-name {
-  font-weight: 600;
-  font-size: 13px;
-  color: #1a1a1a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.workspace-plan {
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
 </style>
