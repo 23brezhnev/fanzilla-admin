@@ -3,7 +3,13 @@
     <n-space vertical :size="20">
       <!-- Header -->
       <n-space justify="space-between" align="center">
-        <h2 style="margin: 0; font-size: 24px; font-weight: 700">Управление событиями</h2>
+        <n-space align="center" :size="12">
+          <h2 style="margin: 0; font-size: 24px; font-weight: 700">Управление событиями</h2>
+          <n-radio-group v-model:value="viewMode" size="small">
+            <n-radio-button value="list">Список</n-radio-button>
+            <n-radio-button value="calendar">Календарь</n-radio-button>
+          </n-radio-group>
+        </n-space>
         <n-button type="primary" @click="router.push('/events/create')">Создать событие</n-button>
       </n-space>
 
@@ -41,25 +47,77 @@
         </n-space>
       </n-card>
 
-      <!-- Single table -->
-      <n-data-table
-        :columns="columns"
-        :data="tableData"
-        :bordered="false"
-        :single-line="false"
-        :row-class-name="rowClassName"
-        :row-key="row => row._rowKey"
-        :pagination="false"
-      />
-
-      <div style="display: flex; justify-content: space-between; align-items: center">
-        <span style="font-size: 13px; color: #999">Всего: {{ filteredEvents.length }}</span>
-        <n-pagination
-          v-model:page="currentPage"
-          :page-count="pageCount"
-          :page-slot="7"
+      <template v-if="viewMode === 'list'">
+        <n-data-table
+          :columns="columns"
+          :data="tableData"
+          :bordered="false"
+          :single-line="false"
+          :row-class-name="rowClassName"
+          :row-key="row => row._rowKey"
+          :pagination="false"
         />
-      </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 13px; color: #999">Всего: {{ filteredEvents.length }}</span>
+          <n-pagination
+            v-model:page="currentPage"
+            :page-count="pageCount"
+            :page-slot="7"
+          />
+        </div>
+      </template>
+
+      <template v-else>
+        <n-card>
+          <n-space justify="space-between" align="center" style="margin-bottom: 16px">
+            <n-space align="center" :size="8">
+              <n-button quaternary circle @click="goToPreviousMonth">‹</n-button>
+              <div style="font-size: 18px; font-weight: 700; min-width: 180px">{{ visibleMonthLabel }}</div>
+              <n-button quaternary circle @click="goToNextMonth">›</n-button>
+            </n-space>
+            <n-button quaternary @click="goToCurrentMonth">Текущий месяц</n-button>
+          </n-space>
+
+          <div class="calendar-grid calendar-grid--head">
+            <div v-for="dayName in calendarWeekdays" :key="dayName" class="calendar-head-cell">
+              {{ dayName }}
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <div
+              v-for="day in calendarDays"
+              :key="day.key"
+              class="calendar-cell"
+              :class="{
+                'calendar-cell--muted': !day.isCurrentMonth,
+                'calendar-cell--today': day.isToday
+              }"
+            >
+              <div class="calendar-cell__date">{{ day.dayNumber }}</div>
+
+              <div v-if="day.events.length === 0" class="calendar-cell__empty">
+                —
+              </div>
+
+              <div v-else class="calendar-cell__events">
+                <button
+                  v-for="event in day.events"
+                  :key="event.id"
+                  type="button"
+                  class="calendar-event"
+                  :class="`calendar-event--${event.status}`"
+                  @click="router.push(`/events/${event.id}`)"
+                >
+                  <span class="calendar-event__time">{{ event.timeStart }}</span>
+                  <span class="calendar-event__name">{{ event.name }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </n-card>
+      </template>
     </n-space>
   </div>
 </template>
@@ -71,6 +129,7 @@ import { NTag, NProgress, NButton } from 'naive-ui'
 import { events, eventTypes, eventStatuses, filterByVenueContext } from '../../data/mock.js'
 
 const router = useRouter()
+const viewMode = ref('list')
 
 const filters = ref({
   search: '',
@@ -81,6 +140,8 @@ const filters = ref({
 
 const currentPage = ref(1)
 const pageSize = 20
+const calendarWeekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+const currentMonthCursor = ref(createMonthCursor())
 
 // Track which date groups are collapsed
 const collapsedDates = reactive(new Set())
@@ -160,6 +221,89 @@ function formatDateShort(dateStr) {
   const d = new Date(dateStr)
   return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 }
+
+function createMonthCursor(date = new Date()) {
+  return new Date(date.getFullYear(), date.getMonth(), 1)
+}
+
+function toDateKey(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function isSameDay(left, right) {
+  return toDateKey(left) === toDateKey(right)
+}
+
+function goToPreviousMonth() {
+  currentMonthCursor.value = new Date(
+    currentMonthCursor.value.getFullYear(),
+    currentMonthCursor.value.getMonth() - 1,
+    1
+  )
+}
+
+function goToNextMonth() {
+  currentMonthCursor.value = new Date(
+    currentMonthCursor.value.getFullYear(),
+    currentMonthCursor.value.getMonth() + 1,
+    1
+  )
+}
+
+function goToCurrentMonth() {
+  currentMonthCursor.value = createMonthCursor()
+}
+
+const visibleMonthLabel = computed(() =>
+  currentMonthCursor.value.toLocaleDateString('ru-RU', {
+    month: 'long',
+    year: 'numeric'
+  })
+)
+
+const eventsByDate = computed(() => {
+  const grouped = new Map()
+
+  for (const event of filteredEvents.value) {
+    if (!grouped.has(event.date)) grouped.set(event.date, [])
+    grouped.get(event.date).push(event)
+  }
+
+  return grouped
+})
+
+const calendarDays = computed(() => {
+  const cursor = currentMonthCursor.value
+  const start = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
+  const end = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0)
+  const startOffset = (start.getDay() + 6) % 7
+  const gridStart = new Date(start)
+  gridStart.setDate(start.getDate() - startOffset)
+
+  const endOffset = 6 - ((end.getDay() + 6) % 7)
+  const gridEnd = new Date(end)
+  gridEnd.setDate(end.getDate() + endOffset)
+
+  const days = []
+  const today = new Date()
+
+  for (let day = new Date(gridStart); day <= gridEnd; day.setDate(day.getDate() + 1)) {
+    const copy = new Date(day)
+    const key = toDateKey(copy)
+    days.push({
+      key,
+      dayNumber: copy.getDate(),
+      isCurrentMonth: copy.getMonth() === cursor.getMonth(),
+      isToday: isSameDay(copy, today),
+      events: eventsByDate.value.get(key) || [],
+    })
+  }
+
+  return days
+})
 
 // Build flat data: separator rows only for dates with 2+ events
 const tableData = computed(() => {
@@ -329,5 +473,110 @@ const columns = [
 .row-day-separator:hover td {
   background: #f0f0f2 !important;
   cursor: pointer;
+}
+</style>
+
+<style scoped>
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calendar-grid--head {
+  margin-bottom: 10px;
+}
+
+.calendar-head-cell {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 4px;
+}
+
+.calendar-cell {
+  min-height: 148px;
+  background: #fff;
+  border: 1px solid #eceef3;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.calendar-cell--muted {
+  background: #f8fafc;
+}
+
+.calendar-cell--today {
+  border-color: #1a56ff;
+  box-shadow: 0 0 0 1px rgba(26, 86, 255, 0.08);
+}
+
+.calendar-cell__date {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.calendar-cell__empty {
+  font-size: 13px;
+  color: #c0c4cc;
+}
+
+.calendar-cell__events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-event {
+  border: none;
+  width: 100%;
+  text-align: left;
+  border-radius: 12px;
+  padding: 9px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calendar-event__time {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.calendar-event__name {
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.calendar-event--published {
+  background: #ecfdf3;
+  color: #0f7b47;
+}
+
+.calendar-event--draft {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.calendar-event--paused {
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.calendar-event--completed {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.calendar-event--cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 </style>
