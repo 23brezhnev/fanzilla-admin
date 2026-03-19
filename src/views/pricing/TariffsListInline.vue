@@ -23,6 +23,20 @@
         <n-form-item label="Порядок сортировки" path="sortOrder">
           <n-input-number v-model:value="modalForm.sortOrder" :min="0" placeholder="0" style="width: 100%" />
         </n-form-item>
+        <n-form-item label="Теги">
+          <n-dynamic-tags v-model:value="modalForm.tags" />
+        </n-form-item>
+        <n-form-item label="Фото">
+          <n-upload
+            list-type="image-card"
+            :max="5"
+            :default-upload="false"
+            :file-list="modalForm.photos"
+            @update:file-list="handlePhotosChange"
+          >
+            <span v-if="modalForm.photos.length < 5">Добавить</span>
+          </n-upload>
+        </n-form-item>
       </n-form>
       <template #footer>
         <n-space justify="end">
@@ -36,7 +50,7 @@
 
 <script setup>
 import { ref, reactive, h } from 'vue'
-import { NButton, NSpace, NIcon } from 'naive-ui'
+import { NButton, NSpace, NIcon, NTag } from 'naive-ui'
 import { CreateOutline, TrashOutline } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
 import { tariffs } from '../../data/mock.js'
@@ -48,7 +62,7 @@ const modalFormRef = ref(null)
 
 const colorSwatches = ['#2080f0', '#18a058', '#f0a020', '#d03050', '#8a2be2', '#ff6347', '#333333', '#909399']
 
-const modalForm = reactive({ name: '', slug: '', description: '', color: '#2080f0', sortOrder: 0 })
+const modalForm = reactive({ name: '', slug: '', description: '', color: '#2080f0', sortOrder: 0, tags: [], photos: [] })
 const modalRules = {
   name: { required: true, message: 'Введите название', trigger: 'blur' },
   slug: { required: true, message: 'Введите slug', trigger: 'blur' }
@@ -56,19 +70,56 @@ const modalRules = {
 
 function openCreateModal() {
   editingItem.value = null
-  Object.assign(modalForm, { name: '', slug: '', description: '', color: '#2080f0', sortOrder: 0 })
+  Object.assign(modalForm, { name: '', slug: '', description: '', color: '#2080f0', sortOrder: 0, tags: [], photos: [] })
   showModal.value = true
 }
 
 function openEditModal(row) {
   editingItem.value = row
-  Object.assign(modalForm, { name: row.name, slug: row.slug, description: row.description, color: row.color, sortOrder: row.sortOrder })
+  Object.assign(modalForm, {
+    name: row.name,
+    slug: row.slug,
+    description: row.description,
+    color: row.color,
+    sortOrder: row.sortOrder,
+    tags: [...(row.tags || [])],
+    photos: createUploadFileList(row.photos)
+  })
   showModal.value = true
+}
+
+function createUploadFileList(photos = []) {
+  return photos.map((name, index) => ({
+    id: `${name}-${index}`,
+    name,
+    status: 'finished',
+    url: `https://placehold.co/120x120?text=${encodeURIComponent(name)}`
+  }))
+}
+
+function handlePhotosChange(fileList) {
+  modalForm.photos = fileList.slice(0, 5)
 }
 
 function handleModalSave() {
   modalFormRef.value?.validate((errors) => {
     if (!errors) {
+      if (editingItem.value) {
+        editingItem.value.tags = [...modalForm.tags]
+        editingItem.value.photos = modalForm.photos.map((file) => file.name).slice(0, 5)
+      } else {
+        tariffs.push({
+          id: Date.now(),
+          name: modalForm.name,
+          slug: modalForm.slug,
+          description: modalForm.description,
+          color: modalForm.color,
+          sortOrder: modalForm.sortOrder,
+          templatesCount: 0,
+          tags: [...modalForm.tags],
+          photos: modalForm.photos.map((file) => file.name).slice(0, 5)
+        })
+      }
       message.success(editingItem.value ? 'Тариф обновлён' : 'Тариф создан')
       showModal.value = false
     }
@@ -89,6 +140,17 @@ const columns = [
   },
   { title: 'Slug', key: 'slug', render(row) { return h('code', { style: 'padding: 2px 6px; background: #f4f4f5; border-radius: 4px; font-size: 13px' }, row.slug) } },
   { title: 'Описание', key: 'description', ellipsis: { tooltip: true } },
+  {
+    title: 'Теги', key: 'tags', width: 220,
+    render(row) {
+      const tags = row.tags || []
+      if (!tags.length) return '—'
+      return h(NSpace, { size: 6, wrap: true }, {
+        default: () => tags.map((tag) => h(NTag, { size: 'small', round: true, bordered: false }, { default: () => tag }))
+      })
+    }
+  },
+  { title: 'Фото', key: 'photos', width: 110, align: 'center', render(row) { return (row.photos || []).length } },
   { title: 'Шаблонов', key: 'templatesCount', width: 110, align: 'center' },
   {
     title: 'Действия', key: 'actions', width: 100,

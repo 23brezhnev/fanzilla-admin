@@ -90,9 +90,9 @@ const ws1 = {
     { id: 6, name: 'Новогодний (2024)', status: 'archived', eventsCount: 0 },
   ],
   tariffs: [
-    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Базовый тариф', color: '#2080f0', sortOrder: 1, templatesCount: 7 },
-    { id: 2, name: 'VIP', slug: 'vip', description: 'Премиум-доступ и привилегии', color: '#d03050', sortOrder: 2, templatesCount: 5 },
-    { id: 3, name: 'Льготный', slug: 'discount', description: 'Пенсионеры, инвалиды, многодетные', color: '#f0a020', sortOrder: 3, templatesCount: 7 },
+    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Базовый тариф', color: '#2080f0', sortOrder: 1, templatesCount: 7, tags: ['Популярный', 'Будни'], photos: ['Тариф 1', 'Тариф 2'] },
+    { id: 2, name: 'VIP', slug: 'vip', description: 'Премиум-доступ и привилегии', color: '#d03050', sortOrder: 2, templatesCount: 5, tags: ['VIP', 'Приоритет'], photos: ['VIP 1', 'VIP 2', 'VIP 3'] },
+    { id: 3, name: 'Льготный', slug: 'discount', description: 'Пенсионеры, инвалиды, многодетные', color: '#f0a020', sortOrder: 3, templatesCount: 7, tags: ['Льготы'], photos: ['Льготный 1'] },
   ],
   ticketTypes: [
     { id: 1, name: 'Взрослый', slug: 'adult', channel: 'Все', description: 'от 14 лет', sortOrder: 1, templatesCount: 7 },
@@ -255,9 +255,9 @@ const ws2 = {
     { id: 6, name: 'Летний сезон 2024', status: 'archived', eventsCount: 0 },
   ],
   tariffs: [
-    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Разовое посещение', color: '#2080f0', sortOrder: 1, templatesCount: 6 },
-    { id: 2, name: 'Абонемент', slug: 'subscription', description: 'Безлимитное посещение (месяц)', color: '#18a058', sortOrder: 2, templatesCount: 4 },
-    { id: 3, name: 'Льготный', slug: 'discount', description: 'Пенсионеры, инвалиды', color: '#f0a020', sortOrder: 3, templatesCount: 5 },
+    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Разовое посещение', color: '#2080f0', sortOrder: 1, templatesCount: 6, tags: ['Разовый'], photos: ['Стандарт 1', 'Стандарт 2'] },
+    { id: 2, name: 'Абонемент', slug: 'subscription', description: 'Безлимитное посещение (месяц)', color: '#18a058', sortOrder: 2, templatesCount: 4, tags: ['Месяц', 'Безлимит'], photos: ['Абонемент 1', 'Абонемент 2', 'Абонемент 3'] },
+    { id: 3, name: 'Льготный', slug: 'discount', description: 'Пенсионеры, инвалиды', color: '#f0a020', sortOrder: 3, templatesCount: 5, tags: ['Соцпрограмма'], photos: ['Льготный 1'] },
   ],
   ticketTypes: [
     { id: 1, name: 'Взрослый', slug: 'adult', channel: 'Все', description: 'от 14 лет', sortOrder: 1, templatesCount: 6 },
@@ -404,9 +404,9 @@ const ws3 = {
     { id: 5, name: 'Новогодний концерт', status: 'archived', eventsCount: 0 },
   ],
   tariffs: [
-    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Обычное место', color: '#2080f0', sortOrder: 1, templatesCount: 5 },
-    { id: 2, name: 'VIP', slug: 'vip', description: 'VIP-ложа с обслуживанием', color: '#d03050', sortOrder: 2, templatesCount: 4 },
-    { id: 3, name: 'Льготный', slug: 'discount', description: 'Студенты, пенсионеры, инвалиды', color: '#f0a020', sortOrder: 3, templatesCount: 5 },
+    { id: 1, name: 'Стандартный', slug: 'standard', description: 'Обычное место', color: '#2080f0', sortOrder: 1, templatesCount: 5, tags: ['Базовый', 'Сектор A'], photos: ['Стадион 1', 'Стадион 2'] },
+    { id: 2, name: 'VIP', slug: 'vip', description: 'VIP-ложа с обслуживанием', color: '#d03050', sortOrder: 2, templatesCount: 4, tags: ['VIP', 'Ложа'], photos: ['VIP ложа 1', 'VIP ложа 2', 'VIP ложа 3'] },
+    { id: 3, name: 'Льготный', slug: 'discount', description: 'Студенты, пенсионеры, инвалиды', color: '#f0a020', sortOrder: 3, templatesCount: 5, tags: ['Льготы'], photos: ['Льготный сектор 1'] },
   ],
   ticketTypes: [
     { id: 1, name: 'Взрослый', slug: 'adult', channel: 'Все', description: 'от 16 лет', sortOrder: 1, templatesCount: 5 },

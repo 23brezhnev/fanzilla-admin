@@ -63,6 +63,22 @@
             style="width: 100%"
           />
         </n-form-item>
+
+        <n-form-item label="Теги">
+          <n-dynamic-tags v-model:value="modalForm.tags" />
+        </n-form-item>
+
+        <n-form-item label="Фото">
+          <n-upload
+            list-type="image-card"
+            :max="5"
+            :default-upload="false"
+            :file-list="modalForm.photos"
+            @update:file-list="handlePhotosChange"
+          >
+            <span v-if="modalForm.photos.length < 5">Добавить</span>
+          </n-upload>
+        </n-form-item>
       </n-form>
 
       <template #footer>
@@ -79,7 +95,8 @@
 
 <script setup>
 import { ref, reactive, h } from 'vue'
-import { NButton, NSpace, NIcon } from 'naive-ui'
+import { ref, reactive, h } from 'vue'
+import { NButton, NSpace, NIcon, NTag } from 'naive-ui'
 import { CreateOutline, TrashOutline } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
 import { tariffs } from '../../data/mock.js'
@@ -106,7 +123,9 @@ const modalForm = reactive({
   slug: '',
   description: '',
   color: '#2080f0',
-  sortOrder: 0
+  sortOrder: 0,
+  tags: [],
+  photos: []
 })
 
 const modalRules = {
@@ -121,6 +140,8 @@ function openCreateModal() {
   modalForm.description = ''
   modalForm.color = '#2080f0'
   modalForm.sortOrder = 0
+  modalForm.tags = []
+  modalForm.photos = []
   showModal.value = true
 }
 
@@ -131,15 +152,43 @@ function openEditModal(row) {
   modalForm.description = row.description
   modalForm.color = row.color
   modalForm.sortOrder = row.sortOrder
+  modalForm.tags = [...(row.tags || [])]
+  modalForm.photos = createUploadFileList(row.photos)
   showModal.value = true
+}
+
+function createUploadFileList(photos = []) {
+  return photos.map((name, index) => ({
+    id: `${name}-${index}`,
+    name,
+    status: 'finished',
+    url: `https://placehold.co/120x120?text=${encodeURIComponent(name)}`
+  }))
+}
+
+function handlePhotosChange(fileList) {
+  modalForm.photos = fileList.slice(0, 5)
 }
 
 function handleModalSave() {
   modalFormRef.value?.validate((errors) => {
     if (!errors) {
       if (editingItem.value) {
+        editingItem.value.tags = [...modalForm.tags]
+        editingItem.value.photos = modalForm.photos.map((file) => file.name).slice(0, 5)
         message.success('Тариф обновлён')
       } else {
+        tariffs.push({
+          id: Date.now(),
+          name: modalForm.name,
+          slug: modalForm.slug,
+          description: modalForm.description,
+          color: modalForm.color,
+          sortOrder: modalForm.sortOrder,
+          templatesCount: 0,
+          tags: [...modalForm.tags],
+          photos: modalForm.photos.map((file) => file.name).slice(0, 5)
+        })
         message.success('Тариф создан')
       }
       showModal.value = false
@@ -182,6 +231,32 @@ const columns = [
     title: 'Описание',
     key: 'description',
     ellipsis: { tooltip: true }
+  },
+  {
+    title: 'Теги',
+    key: 'tags',
+    width: 220,
+    render(row) {
+      const tags = row.tags || []
+      if (!tags.length) {
+        return '—'
+      }
+
+      return h(NSpace, { size: 6, wrap: true }, {
+        default: () => tags.map((tag) =>
+          h(NTag, { size: 'small', round: true, bordered: false }, { default: () => tag })
+        )
+      })
+    }
+  },
+  {
+    title: 'Фото',
+    key: 'photos',
+    width: 110,
+    align: 'center',
+    render(row) {
+      return (row.photos || []).length
+    }
   },
   {
     title: 'Шаблонов',

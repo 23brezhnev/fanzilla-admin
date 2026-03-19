@@ -1,1 +1,8 @@
 /* Reset - handled by App.vue global styles */
+
+.n-data-table td,
+.n-data-table th,
+.n-data-table td *,
+.n-data-table th * {
+  user-select: text;
+}
